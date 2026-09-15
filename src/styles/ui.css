@@ -1,16 +1,11 @@
 /* ---------- App column ---------- */
 .app {
   position: relative;
-  max-width: var(--app-w);
   min-height: 100dvh;
   margin-inline: auto;
   background: var(--ground);
   display: flex;
   flex-direction: column;
-}
-
-@media (min-width: 520px) {
-  .app { box-shadow: var(--sh-deep); }
 }
 
 .screen {

@@ -1,4 +1,4 @@
-﻿/* ============================================================
+/* ============================================================
    Scroll-driven sections recreated from the Makro reference:
    page curtain, statement reveal, stacking cards, dark bento,
    closing CTA. Motion itself lives in the components (Motion +
@@ -399,6 +399,6 @@
   .stack-card { --pin-bottom: 16px; }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .stack-card { position: relative; top: 0; }
-}
+/* Calm and off: stacking cards become a plain flow instead of sticky-pinned. */
+[data-motion="calm"] .stack-card,
+[data-motion="off"] .stack-card { position: relative; top: 0; }

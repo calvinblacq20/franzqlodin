@@ -26,13 +26,6 @@ export const spring = {
   micro: { type: "spring", bounce: 0, duration: 0.3 },
 } as const satisfies Record<string, Transition>;
 
-export const reveal = (y = 24, delay = 0) => ({
-  initial: { opacity: 0, y },
-  whileInView: { opacity: 1, y: 0 },
-  viewport: { once: true, amount: 0.3 },
-  transition: { ...spring.small, delay },
-});
-
 export const enter = (y = 24, delay = 0) => ({
   initial: { opacity: 0, y },
   animate: { opacity: 1, y: 0 },
@@ -42,14 +35,6 @@ export const enter = (y = 24, delay = 0) => ({
 export const blurIn = (delay = 0) => ({
   initial: { opacity: 0.001, filter: "blur(10px)", y: 10 },
   animate: { opacity: 1, filter: "blur(0px)", y: 0 },
-  transition: { ...spring.large, delay },
-});
-
-/** Section headings: blur and rise into focus when they scroll into view. */
-export const blurInView = (delay = 0) => ({
-  initial: { opacity: 0.001, filter: "blur(10px)", y: 10 },
-  whileInView: { opacity: 1, filter: "blur(0px)", y: 0 },
-  viewport: { once: true, amount: 0.6 },
   transition: { ...spring.large, delay },
 });
 
