@@ -1,0 +1,146 @@
+{
+  "agbada-maroon": {
+    "sm": 480,
+    "w": 1080,
+    "w2x": 2160,
+    "h": 1440
+  },
+  "agbada-pink": {
+    "sm": 480,
+    "w": 1080,
+    "w2x": 2160,
+    "h": 1442
+  },
+  "church-white-robe": {
+    "sm": 480,
+    "w": 1080,
+    "w2x": 2160,
+    "h": 1440
+  },
+  "kaftan-embroidered": {
+    "sm": 480,
+    "w": 1080,
+    "w2x": 2160,
+    "h": 1920
+  },
+  "kaftan-yellow": {
+    "sm": 480,
+    "w": 1080,
+    "w2x": 2160,
+    "h": 1920
+  },
+  "kids-green": {
+    "sm": 480,
+    "w": 1080,
+    "w2x": 2160,
+    "h": 1614
+  },
+  "kids-purple": {
+    "sm": 480,
+    "w": 1080,
+    "w2x": 2160,
+    "h": 1304
+  },
+  "look-church": {
+    "sm": 480,
+    "w": 1080,
+    "w2x": 2160,
+    "h": 1440
+  },
+  "look-everyday": {
+    "sm": 480,
+    "w": 1080,
+    "w2x": 2160,
+    "h": 1632
+  },
+  "look-funeral": {
+    "sm": 480,
+    "w": 1080,
+    "w2x": 2160,
+    "h": 1440
+  },
+  "look-political": {
+    "sm": 480,
+    "w": 1080,
+    "w2x": 2160,
+    "h": 1470
+  },
+  "political-green-yellow": {
+    "sm": 480,
+    "w": 1080,
+    "w2x": 2160,
+    "h": 1656
+  },
+  "safari-beige": {
+    "sm": 480,
+    "w": 1080,
+    "w2x": 2160,
+    "h": 1440
+  },
+  "senator-peach": {
+    "sm": 480,
+    "w": 1080,
+    "w2x": 2160,
+    "h": 1790
+  },
+  "shirt-embroidered-white": {
+    "sm": 480,
+    "w": 1080,
+    "w2x": 2160,
+    "h": 1440
+  },
+  "shirt-print-blue": {
+    "sm": 480,
+    "w": 1080,
+    "w2x": 2160,
+    "h": 1694
+  },
+  "studio-cutting": {
+    "sm": 480,
+    "w": 1080,
+    "w2x": 2160,
+    "h": 1440
+  },
+  "studio-showroom-2": {
+    "sm": 480,
+    "w": 1080,
+    "w2x": 2160,
+    "h": 1920
+  },
+  "studio-showroom": {
+    "sm": 480,
+    "w": 1080,
+    "w2x": 2160,
+    "h": 1008
+  },
+  "suit-black-mandarin": {
+    "sm": 480,
+    "w": 1080,
+    "w2x": 2160,
+    "h": 1440
+  },
+  "suit-blue": {
+    "sm": 480,
+    "w": 1080,
+    "w2x": 2160,
+    "h": 1620
+  },
+  "suit-double-navy": {
+    "sm": 480,
+    "w": 1080,
+    "w2x": 2160,
+    "h": 1920
+  },
+  "suit-mandarin-maroon": {
+    "sm": 480,
+    "w": 1080,
+    "w2x": 2160,
+    "h": 1568
+  },
+  "wedding-groomsmen": {
+    "sm": 480,
+    "w": 1080,
+    "w2x": 2160,
+    "h": 1440
+  }
+}

@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en" data-motion="off">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <script>
+      // Motion is resolved once, before first paint, into <html data-motion="full|calm|off">.
+      // CSS and JS read that attribute, never prefers-reduced-motion directly (on iOS it is also on
+      // in Low Power Mode). ?motion=full|calm|off overrides it. Keep in step with src/lib/ambient.ts.
+      (function () {
+        var mode = "full";
+        try {
+          var pick = function (query) {
+            var match = /(?:^|[?&])motion=(full|calm|off)(?:&|$)/.exec(query);
+            return match ? match[1] : null;
+          };
+          var hash = location.hash;
+          var forced = pick(location.search) || (hash.indexOf("?") > -1 ? pick(hash.slice(hash.indexOf("?"))) : null);
+          if (forced) mode = forced;
+          else if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) mode = "calm";
+        } catch (error) {
+          mode = "full";
+        }
+        document.documentElement.setAttribute("data-motion", mode);
+      })();
+    </script>
+    <meta name="theme-color" content="#EBEFF5" />
+    <meta name="description" content="Franz Qlodin: custom suits, kaftans and agbada made to measure in Kasoa, Ghana. Order, book a fitting and track your outfit." />
+    <title>Franz Qlodin: Made to Measure</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Fragment+Mono&family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600&display=swap"
+    />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
