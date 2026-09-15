@@ -44,9 +44,8 @@ export function Marquee({ children, label, speed = 32, direction = "left", pause
     // Layout, measured on resize and on the watchdog tick only.
     let loopWidth = 0;
     let viewWidth = 0;
-    let pageTop = 0;
-    let pageBottom = 0;
     let dpr = 1;
+    let onScreen = true;
     const measure = () => {
       const previous = loopWidth;
       loopWidth = set.offsetWidth;
@@ -56,12 +55,7 @@ export function Marquee({ children, label, speed = 32, direction = "left", pause
         write();
       }
       viewWidth = viewport.clientWidth;
-      const rect = viewport.getBoundingClientRect();
-      pageTop = rect.top + window.scrollY;
-      pageBottom = pageTop + rect.height;
       dpr = window.devicePixelRatio || 1;
-      const still = loopWidth <= viewWidth;
-      if (still !== viewport.hasAttribute("data-still")) viewport.toggleAttribute("data-still", still);
     };
 
     let offset = 0;
@@ -90,9 +84,7 @@ export function Marquee({ children, label, speed = 32, direction = "left", pause
       beat = performance.now();
       const step = frameStep(now, last);
       last = now;
-      if (pausedRef.current || hovered || focused || drag || now < resumeAt || loopWidth <= viewWidth) return;
-      const scrollY = window.scrollY;
-      if (scrollY + window.innerHeight <= pageTop || scrollY >= pageBottom) return;
+      if (pausedRef.current || hovered || focused || drag || now < resumeAt || !onScreen || loopWidth <= 0) return;
       offset = advance(offset, step, speed, loopWidth);
       write();
     };
@@ -102,6 +94,20 @@ export function Marquee({ children, label, speed = 32, direction = "left", pause
       last = null;
       frame = requestAnimationFrame(tick);
     };
+
+    // Observer pauses when far off-screen to save battery, but onScreen starts true so it never gates startup
+    const io =
+      typeof IntersectionObserver !== "undefined"
+        ? new IntersectionObserver(
+            (entries) => {
+              for (const entry of entries) {
+                onScreen = entry.isIntersecting;
+              }
+            },
+            { rootMargin: "300px 0px" },
+          )
+        : null;
+    io?.observe(viewport);
 
     const watchdog = window.setInterval(() => {
       measure();
@@ -132,7 +138,7 @@ export function Marquee({ children, label, speed = 32, direction = "left", pause
         drag.axis = Math.abs(dx) > Math.abs(dy) ? "x" : "y";
         if (drag.axis === "x") viewport.setPointerCapture(e.pointerId);
       }
-      if (drag.axis !== "x" || loopWidth <= viewWidth) return;
+      if (drag.axis !== "x" || loopWidth <= 0) return;
       dragged = true;
       offset = wrap(rightward ? drag.from + dx : drag.from - dx, loopWidth);
       // Written straight away: Safari holds animation frames while a finger is on the screen.
@@ -161,7 +167,7 @@ export function Marquee({ children, label, speed = 32, direction = "left", pause
       focused = true;
       viewport.scrollLeft = 0;
       const card = (e.target as HTMLElement).closest<HTMLElement>(".marquee-set > *");
-      if (card && loopWidth > viewWidth) {
+      if (card && loopWidth > 0) {
         offset = wrap(rightward ? loopWidth - card.offsetLeft + 16 : card.offsetLeft - 16, loopWidth);
         write();
       }
@@ -195,6 +201,7 @@ export function Marquee({ children, label, speed = 32, direction = "left", pause
     return () => {
       cancelAnimationFrame(frame);
       window.clearInterval(watchdog);
+      io?.disconnect();
       resizeObserver.disconnect();
       viewport.removeEventListener("pointerdown", onPointerDown);
       viewport.removeEventListener("pointermove", onPointerMove);
@@ -219,7 +226,10 @@ export function Marquee({ children, label, speed = 32, direction = "left", pause
         <div ref={setRef} className="marquee-set">
           {children}
         </div>
-        {/* The second copy closes the loop; screen readers and keyboards skip it. */}
+        {/* Extra copies close the loop seamlessly across all screen sizes */}
+        <div className="marquee-set" aria-hidden="true" inert>
+          {children}
+        </div>
         <div className="marquee-set" aria-hidden="true" inert>
           {children}
         </div>

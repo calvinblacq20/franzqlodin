@@ -74,7 +74,69 @@
 
 .clamp-3 { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 
-.look-card { display: block; width: 150px; }
+/* ---------- Horizontal Marquee Row ---------- */
+.marquee {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: pan-y;
+  cursor: grab;
+}
+.marquee:active {
+  cursor: grabbing;
+}
+.marquee-track {
+  display: flex !important;
+  width: max-content !important;
+  will-change: transform;
+}
+.marquee-set {
+  display: flex !important;
+  align-items: center;
+  flex-shrink: 0 !important;
+  gap: 14px;
+  padding-right: 14px;
+}
+[data-motion="off"] .marquee {
+  overflow-x: auto;
+  scrollbar-width: none;
+  cursor: auto;
+}
+[data-motion="off"] .marquee::-webkit-scrollbar {
+  display: none;
+}
+[data-motion="off"] .marquee-set[aria-hidden="true"] {
+  display: none !important;
+}
+
+.looks {
+  margin-inline: calc(var(--gutter) * -1);
+  width: calc(100% + var(--gutter) * 2);
+  padding-block: 4px;
+}
+.look-card {
+  display: block;
+  width: 160px;
+  flex: none;
+  border-radius: var(--r-img);
+  overflow: hidden;
+  transition: transform 0.2s ease;
+}
+.look-card:hover {
+  transform: scale(1.02);
+}
+@media (min-width: 810px) {
+  .looks {
+    margin-inline: 0;
+    width: 100%;
+    border-radius: var(--r-24);
+  }
+  .look-card {
+    width: 220px;
+  }
+}
 .look-label {
   position: absolute;
   left: 10px;
