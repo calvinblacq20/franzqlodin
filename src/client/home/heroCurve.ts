@@ -32,14 +32,19 @@ export function heroCurve(width: number, height: number, bend: number, overlap =
   };
 }
 
-/** Clip path and badge offset for a hero that starts as a U and straightens as the page scrolls. */
+/**
+ * Clip path and badge offset for a hero that starts as a U and straightens as the page scrolls.
+ * The U is part of the design, not an animation, so it shows in every motion mode: calm and off
+ * (reduced motion, which iOS also reports in Low Power Mode) keep it still instead of flattening it.
+ */
 export function useHeroCurve(ref: RefObject<HTMLElement | null>, { overlap = 0, badgeInset = 16 } = {}) {
-  // The curve flattening with scroll is scroll-coupled motion: calm mode keeps the straight edge.
-  const reduce = isCalm();
+  const still = isCalm();
   const width = useMotionValue(0);
   const height = useMotionValue(0);
+  const resting = useMotionValue(1);
   const { scrollY } = useScroll();
-  const bend = useSpring(useTransform(scrollY, [0, SETTLE_PX], [1, 0]), spring.press);
+  const flattening = useSpring(useTransform(scrollY, [0, SETTLE_PX], [1, 0]), spring.press);
+  const bend = still ? resting : flattening;
 
   useEffect(() => {
     const el = ref.current;
@@ -54,5 +59,6 @@ export function useHeroCurve(ref: RefObject<HTMLElement | null>, { overlap = 0, 
 
   const clipPath = useTransform([bend, width, height], ([k = 0, w = 0, h = 0]: number[]) => (w ? heroCurve(w, h, k, overlap).path : "none"));
   const badgeY = useTransform([bend, width, height], ([k = 0, w = 0, h = 0]: number[]) => (w ? heroCurve(w, h, k, overlap).lift(badgeInset) : 0));
-  return reduce ? { clipPath: undefined, badgeY: undefined } : { clipPath, badgeY };
+  // Safari before 14 only reads the prefixed property.
+  return { clipPath, WebkitClipPath: clipPath, badgeY };
 }

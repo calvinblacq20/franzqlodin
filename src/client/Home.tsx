@@ -185,7 +185,7 @@ function StudioPage() {
       </div>
 
       {/* Wider screens: photo gallery grid */}
-      <motion.div ref={galleryRef} className="desk-gallery desktop-only" style={{ clipPath: galleryCurve.clipPath }}>
+      <motion.div ref={galleryRef} className="desk-gallery desktop-only" style={{ clipPath: galleryCurve.clipPath, WebkitClipPath: galleryCurve.WebkitClipPath }}>
         {HERO.slice(0, 3).map((shot, i) => (
           <div key={shot.src} className="gallery-cell">
             <motion.div className="gallery-inner" initial={calm ? { opacity: 0 } : { scale: 1.18, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ ...spring.settle, delay: 0.08 * i }} style={calm ? undefined : { y: heroY }}>
@@ -199,7 +199,7 @@ function StudioPage() {
       </motion.div>
 
       {/* Phone: hero carousel */}
-      <motion.div ref={heroRef} className="hero mobile-only" style={{ clipPath: heroCurve.clipPath }}>
+      <motion.div ref={heroRef} className="hero mobile-only" style={{ clipPath: heroCurve.clipPath, WebkitClipPath: heroCurve.WebkitClipPath }}>
         <motion.div
           className="hero-track"
           style={calm ? undefined : { y: heroY, scale: heroScale }}
