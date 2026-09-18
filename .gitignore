@@ -6,8 +6,7 @@ coverage
 !.env.example
 *.log
 .DS_Store
-.claude
 __pycache__
 
-# AI upscaling intermediates (large PNGs; rebuild with scripts/upscale_photos.py)
+# Upscaling intermediates (large PNGs; rebuild with scripts/upscale_photos.py)
 brand/photos-upscaled/
