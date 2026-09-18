@@ -17,6 +17,12 @@
     "w2x": 2160,
     "h": 1440
   },
+  "group-uniform-blue": {
+    "sm": 480,
+    "w": 1080,
+    "w2x": 1920,
+    "h": 1440
+  },
   "kaftan-embroidered": {
     "sm": 480,
     "w": 1080,

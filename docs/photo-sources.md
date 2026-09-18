@@ -28,6 +28,7 @@ All photos in `public/photos/` come from the studio's own TikTok account, [@fran
 | look-funeral.webp | Funeral lookbook | 7417110245983522054 |
 | look-political.webp | Political event lookbook | 7386766842330664197 |
 | look-everyday.webp | Everyday lookbook | 7664496680657554708 |
+| group-uniform-blue.webp | Staff & group uniform (a church band's royal-blue set with an embroidered emblem) | 7380099022721142022 (video frame at 19.4s; TikTok only serves it at 480×848, so the frame is upscaled with Real-ESRGAN) |
 
 Post links follow the pattern `https://www.tiktok.com/@franz.qlodin/photo/<post id>` (or `/video/` for the showroom clips).
 
