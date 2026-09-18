@@ -5,7 +5,8 @@ export type { MotionMode };
 
 /**
  * The motion mode index.html resolved before first paint. Read this, never the
- * prefers-reduced-motion media query, so CSS and JS can't disagree.
+ * prefers-reduced-motion media query, so CSS and JS can't disagree. Every device runs
+ * "full"; calm and off are only reachable with ?motion= (for testing).
  *   full: everything runs · calm: fades and ambient loops only · off: static
  */
 export function motionMode(): MotionMode {

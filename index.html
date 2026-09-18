@@ -5,8 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <script>
       // Motion is resolved once, before first paint, into <html data-motion="full|calm|off">.
-      // CSS and JS read that attribute, never prefers-reduced-motion directly (on iOS it is also on
-      // in Low Power Mode). ?motion=full|calm|off overrides it. Keep in step with src/lib/ambient.ts.
+      // Every device gets full motion, whatever its reduced-motion setting (iOS also turns that on
+      // in Low Power Mode). ?motion=full|calm|off overrides it for testing. Keep in step with
+      // src/lib/ambient.ts.
       (function () {
         var mode = "full";
         try {
@@ -17,7 +18,6 @@
           var hash = location.hash;
           var forced = pick(location.search) || (hash.indexOf("?") > -1 ? pick(hash.slice(hash.indexOf("?"))) : null);
           if (forced) mode = forced;
-          else if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) mode = "calm";
         } catch (error) {
           mode = "full";
         }

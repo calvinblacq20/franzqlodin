@@ -22,12 +22,12 @@ export function motionOverride(search: string, hash: string): MotionMode | null 
 }
 
 /**
- * The override wins; otherwise a reduced-motion request means "calm", never "off". On iOS that
- * request is also on for Low Power Mode, so it must not switch motion off entirely.
- * Mirrors the inline script in index.html, which applies this before first paint.
+ * Full motion on every device unless the URL asks for less. The device's reduced-motion setting
+ * is deliberately not read: iOS turns it on in Low Power Mode, and the studio wants the same
+ * experience on every phone. Mirrors the inline script in index.html, which runs before first paint.
  */
-export function resolveMotionMode(search: string, hash: string, prefersReduced: boolean): MotionMode {
-  return motionOverride(search, hash) ?? (prefersReduced ? "calm" : "full");
+export function resolveMotionMode(search: string, hash: string): MotionMode {
+  return motionOverride(search, hash) ?? "full";
 }
 
 /** Wraps a position into [0, length). */

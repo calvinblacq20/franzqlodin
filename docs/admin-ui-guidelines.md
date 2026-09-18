@@ -350,7 +350,7 @@ Icon rail on the left. Right rails (pattern D) drop below the main column as a h
 
 ## 12. Motion
 
-The admin uses the same motion engine and springs as the client (`src/motion.ts`), and the same `MotionConfig reducedMotion="user"`. It leaves out the marketing scroll effects, because the owner opens these screens many times a day.
+The admin uses the same motion engine and springs as the client (`src/motion.ts`), and the same motion mode from `motionMode()` (full on every device; `?motion=` lowers it for testing). It leaves out the marketing scroll effects, because the owner opens these screens many times a day.
 
 | Keep | Where |
 |---|---|
@@ -398,7 +398,7 @@ The admin uses the same motion engine and springs as the client (`src/motion.ts`
 - [ ] Lists page 20 at a time; filters live in the URL.
 - [ ] Charts have labels, a table view and an `aria-label` summary; no category colour used as a line or text.
 - [ ] Everything works by keyboard (sidebar, tabs, filters, chart points, sheets) and has 44px touch targets on phones.
-- [ ] Motion plays once, respects reduced motion, and never blocks input.
+- [ ] Motion plays once and never blocks input. Every device gets full motion (decided 18 Sept 2026); test calmer modes with `?motion=calm` or `?motion=off`.
 - [ ] Tests for any new logic (KPI deltas, period comparison, filter and sort), in the same session.
 
 ---

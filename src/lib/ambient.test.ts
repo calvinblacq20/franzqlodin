@@ -13,10 +13,10 @@ describe("motion mode", () => {
     expect(motionOverride("", "")).toBeNull();
   });
 
-  it("treats a reduced-motion request as calm, never off", () => {
-    expect(resolveMotionMode("", "#/", true)).toBe("calm");
-    expect(resolveMotionMode("", "#/", false)).toBe("full");
-    expect(resolveMotionMode("?motion=full", "#/", true)).toBe("full");
+  it("runs full motion on every device unless the URL asks for less", () => {
+    expect(resolveMotionMode("", "#/")).toBe("full");
+    expect(resolveMotionMode("?motion=calm", "#/")).toBe("calm");
+    expect(resolveMotionMode("", "#/explore?motion=off")).toBe("off");
   });
 });
 

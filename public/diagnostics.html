@@ -14,8 +14,9 @@
     };
     var hash = location.hash;
     var forced = pick(location.search) || (hash.indexOf("?") > -1 ? pick(hash.slice(hash.indexOf("?"))) : null);
+    // Same rule as the app: full motion unless ?motion= asks for less. The device's
+    // reduced-motion setting is shown below for reference but no longer changes the mode.
     if (forced) mode = forced;
-    else if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) mode = "calm";
   } catch (e) {
     mode = "full";
   }
