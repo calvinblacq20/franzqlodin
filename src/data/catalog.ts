@@ -22,8 +22,8 @@ export const OCCASIONS: { id: Occasion; label: string; categories: CategoryId[] 
   { id: "other", label: "Something else", categories: [] },
 ];
 
-/** Sample catalogue and prices for the demo; the owner sets real prices. Photos are from the studio's TikTok (@franz.qlodin). */
-export const STYLES: Style[] = [
+/** Starting catalogue and prices. The owner edits them in Styles & prices, and the store keeps the edits. Photos are from the studio's TikTok (@franz.qlodin). */
+const DEFAULT_STYLES: Style[] = [
   { id: "kaftan-plain", name: "Two-piece kaftan", category: "kaftans", description: "Classic long top and trousers in plain or print fabric.", fromPrice: 450, studioFabricFrom: 250, readyDays: 7, featured: true, tone: "sand", photo: "/photos/kaftan-yellow.webp" },
   { id: "kaftan-embroidered", name: "Embroidered kaftan", category: "kaftans", description: "Two-piece kaftan with hand-finished neckline embroidery.", fromPrice: 650, studioFabricFrom: 250, readyDays: 10, featured: true, tone: "lilac", photo: "/photos/kaftan-embroidered.webp" },
   { id: "senator", name: "Senator set", category: "kaftans", description: "Structured long top with side slits and matching trousers.", fromPrice: 550, studioFabricFrom: 280, readyDays: 7, tone: "steel", photo: "/photos/senator-peach.webp" },
@@ -78,6 +78,22 @@ export const MEASURE_SOURCE_LABEL: Record<MeasureSource, string> = {
   whatsapp: "Sent on WhatsApp",
 };
 
-export const styleById = (id: string) => STYLES.find((s) => s.id === id);
+export const defaultStyles = (): Style[] => DEFAULT_STYLES.map((style) => ({ ...style }));
+
+/** The catalogue clients see: every style the owner hasn't hidden. `applyStyles` keeps it in step with the store. */
+export const STYLES: Style[] = defaultStyles();
+
+/** Every style ever offered, hidden ones included, so past orders still show their name. */
+const ALL_STYLES = new Map<string, Style>(STYLES.map((s) => [s.id, s]));
+
+export function applyStyles(styles: Style[]) {
+  ALL_STYLES.clear();
+  for (const style of styles) ALL_STYLES.set(style.id, style);
+  for (const style of DEFAULT_STYLES) if (!ALL_STYLES.has(style.id)) ALL_STYLES.set(style.id, style);
+  STYLES.length = 0;
+  STYLES.push(...styles.filter((s) => s.active !== false));
+}
+
+export const styleById = (id: string) => ALL_STYLES.get(id);
 export const categoryLabel = (id: CategoryId) => CATEGORIES.find((c) => c.id === id)?.label ?? id;
 export const occasionLabel = (id: Occasion) => OCCASIONS.find((o) => o.id === id)?.label ?? id;

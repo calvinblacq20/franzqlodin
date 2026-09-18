@@ -103,3 +103,7 @@ a {
   transition-duration: 0.01ms !important;
   scroll-behavior: auto !important;
 }
+
+/* Calm: photos fade in without the slight zoom (fades stay; zooms go). */
+[data-motion="calm"] .photo img,
+[data-motion="off"] .photo img { transform: none; }

@@ -149,6 +149,10 @@
     <span class="label">document.timeline</span>
     <span class="value" id="timeline">—</span>
   </div>
+  <div class="row">
+    <span class="label">CSS animation advancing</span>
+    <span class="value" id="cssanim">—</span>
+  </div>
 </div>
 
 <h2>Animation Test</h2>
@@ -236,26 +240,50 @@
     el.className = "value " + (rafRunning ? "ok" : "bad");
     rafRunning = false;
 
-    // document.timeline
+    // document.timeline: is it advancing, not just present?
     var tlEl = document.getElementById("timeline");
     if (document.timeline && typeof document.timeline.currentTime === "number") {
-      tlEl.textContent = Math.round(document.timeline.currentTime) + "ms";
-      tlEl.className = "value ok";
+      var tl = document.timeline.currentTime;
+      var moved = lastTimeline !== null && tl > lastTimeline;
+      tlEl.textContent = Math.round(tl) + "ms · " + (lastTimeline === null ? "checking" : moved ? "advancing" : "STUCK");
+      tlEl.className = "value " + (lastTimeline === null || moved ? "ok" : "bad");
+      lastTimeline = tl;
     } else {
       tlEl.textContent = "unavailable";
       tlEl.className = "value warn";
     }
+
+    // CSS keyframe animation: sampled from the Web Animations API, or from the computed transform.
+    var cssEl = document.getElementById("cssanim");
+    var cssBar = document.querySelector(".css-bar");
+    var anims = cssBar && cssBar.getAnimations ? cssBar.getAnimations() : [];
+    var sample = anims.length && typeof anims[0].currentTime === "number" ? anims[0].currentTime : cssBar ? getComputedStyle(cssBar).transform : null;
+    if (sample === null) {
+      cssEl.textContent = "no animation found";
+      cssEl.className = "value bad";
+    } else {
+      var advancing = lastCss !== null && sample !== lastCss;
+      cssEl.textContent = lastCss === null ? "checking" : advancing ? "yes" : "NO (frozen)";
+      cssEl.className = "value " + (lastCss === null || advancing ? "ok" : "bad");
+      lastCss = sample;
+    }
   }, 1000);
+  var lastTimeline = null;
+  var lastCss = null;
 
   // --- JS animation bar ---
   var jsbar = document.getElementById("jsbar");
   var barWrap = jsbar.parentElement;
   var jsStart = performance.now();
+  // Measured on resize, never inside the loop: a layout read after a transform write forces a re-layout.
+  var maxX = 0;
+  function measureBar() { maxX = barWrap.clientWidth - 40; }
+  measureBar();
+  window.addEventListener("resize", measureBar);
   function animateBar(now) {
     var elapsed = (now - jsStart) % 2000;
     var t = elapsed / 1000; // 0..2
     var progress = t < 1 ? t : 2 - t; // triangle wave 0..1..0
-    var maxX = barWrap.clientWidth - 40;
     jsbar.style.transform = "translateX(" + (progress * maxX) + "px)";
     requestAnimationFrame(animateBar);
   }

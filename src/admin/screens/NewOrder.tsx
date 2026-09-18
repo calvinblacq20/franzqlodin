@@ -5,9 +5,9 @@ import { Avatar } from "../../components/Bits";
 import { Button, Cta } from "../../components/Button";
 import { SuccessScreen } from "../../components/Overlays";
 import { HOURS } from "../../data/business";
-import { CATEGORIES, EMBROIDERY_OPTIONS, FIT_OPTIONS, MEASURE_SOURCE_LABEL, OCCASIONS, STYLES, styleById } from "../../data/catalog";
+import { CATEGORIES, EMBROIDERY_OPTIONS, FIT_OPTIONS, MEASURE_SOURCE_LABEL, OCCASIONS, styleById } from "../../data/catalog";
 import { studio, useAppData, type WalkInOrder } from "../../data/store";
-import type { Embroidery, FabricSource, Fit, LeadSource, MeasurePlan, Occasion, PaymentMethod } from "../../data/types";
+import type { Embroidery, FabricSource, Fit, LeadSource, MeasurePlan, Occasion, PaymentMethod, Style } from "../../data/types";
 import { formatGhPhone, normalizeGhPhone } from "../../lib/contact";
 import { dayKey, fmtDate, fmtDayShort, money, parseLocal } from "../../lib/format";
 import { depositFor, EMBROIDERY_ADD, estimate, unitPrice } from "../../lib/pricing";
@@ -35,7 +35,9 @@ const METHODS: { id: PaymentMethod; label: string }[] = [
 
 const toNumber = (v: string) => Number(v.replace(/[^\d.]/g, ""));
 
-const STYLE_OPTIONS: DropdownOption<string>[] = CATEGORIES.flatMap((c) => STYLES.filter((s) => s.category === c.id).map((s) => ({ value: s.id, label: s.name, hint: `from ${money(s.fromPrice)}`, group: c.label })));
+/** The catalogue as it stands now: the owner's prices, without the styles they've hidden. */
+const styleOptions = (styles: Style[]): DropdownOption<string>[] =>
+  CATEGORIES.flatMap((c) => styles.filter((s) => s.category === c.id && s.active !== false).map((s) => ({ value: s.id, label: s.name, hint: `from ${money(s.fromPrice)}`, group: c.label })));
 
 export function NewOrder() {
   const data = useAppData();
@@ -66,6 +68,7 @@ export function NewOrder() {
   const [error, setError] = useState<string | null>(null);
   const [saved, setSaved] = useState<string | null>(null);
 
+  const styles = useMemo(() => styleOptions(data.styles), [data.styles]);
   const chosen = data.customers.find((c) => c.id === clientId);
   const matches = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -273,7 +276,7 @@ export function NewOrder() {
                     <div className="adm-grid" style={{ gridTemplateColumns: "minmax(0, 1fr) auto", gap: 12, alignItems: "end" }}>
                       <div className="field">
                         <label htmlFor={`style-${line.key}`}>Style</label>
-                        <Dropdown id={`style-${line.key}`} variant="field" placeholder="Choose a style" value={line.styleId} onChange={(styleId) => chooseStyle(line.key, styleId)} options={STYLE_OPTIONS} />
+                        <Dropdown id={`style-${line.key}`} variant="field" placeholder="Choose a style" value={line.styleId} onChange={(styleId) => chooseStyle(line.key, styleId)} options={styles} />
                       </div>
                       <div className="inline" style={{ gap: 6 }} aria-label="Quantity">
                         <button type="button" className="icon-btn" style={{ width: 36, height: 36 }} onClick={() => update(line.key, { qty: Math.max(1, line.qty - 1) })} aria-label="One fewer">

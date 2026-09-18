@@ -28,6 +28,7 @@ npm run build
 ## Demo notes
 
 - All data is sample data kept in the browser (`localStorage`). **Profile → Reset demo data** (client) or **Settings → Reset demo data** (admin) restores it.
+- Prices, turnarounds and studio details are editable on the owner side (**Styles & prices**, **Settings**) and the client app follows them straight away. Past orders keep the price they were quoted.
 - The owner side has no login in the demo; open `#/admin`. The studio's order book is simulated over five months from fixed seeds (`src/data/studio-seed.ts`), so every reset gives the same clients, orders and payments, dated relative to today.
 - WhatsApp updates from the admin open WhatsApp with the message filled in; nothing is sent automatically.
 - You start without an account, and you can order without one. To see the sample order history, log in from **Profile** with the sample account `024 555 0142`.

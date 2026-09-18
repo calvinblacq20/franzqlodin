@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { motionMode } from "../motion";
 
 const seen = new Set<string>();
 
@@ -17,8 +18,7 @@ export function useFirstLoad(key: string, ms = 450): boolean {
   const [loading, setLoading] = useState(first);
   useEffect(() => {
     if (!first) return;
-    const reduce = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
-    const timer = window.setTimeout(() => setLoading(false), reduce ? 0 : ms);
+    const timer = window.setTimeout(() => setLoading(false), motionMode() === "full" ? ms : 0);
     return () => window.clearTimeout(timer);
   }, [first, ms]);
   return loading;

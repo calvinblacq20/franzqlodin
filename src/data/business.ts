@@ -1,6 +1,37 @@
 import type { Hours } from "../lib/schedule";
 
-export const STUDIO = {
+export interface StudioDetails {
+  name: string;
+  tagline: string;
+  category: string;
+  about: string;
+  area: string;
+  address: string;
+  directions: string;
+  mapsQuery: string;
+  phone: string;
+  whatsappBusiness: string;
+  tiktok: string;
+  owner: string;
+  rating: number;
+  reviewCount: number;
+}
+
+export interface Policies {
+  cancellation: string;
+  deposit: string;
+  collection: string;
+  important: string;
+}
+
+/** Everything the owner can change in Settings. */
+export interface StudioSettings {
+  studio: StudioDetails;
+  hours: Hours;
+  policies: Policies;
+}
+
+const DEFAULT_STUDIO: StudioDetails = {
   name: "Franz Qlodin",
   tagline: "Bespoke menswear",
   category: "Tailor · Menswear",
@@ -17,10 +48,10 @@ export const STUDIO = {
   /** Sample figures for the demo. */
   rating: 4.9,
   reviewCount: 126,
-} as const;
+};
 
-/** Sample opening hours for the demo; the studio confirms real hours. */
-export const HOURS: Hours = {
+/** Sample opening hours for the demo; the owner sets the real ones in Settings. */
+const DEFAULT_HOURS: Hours = {
   0: null,
   1: ["08:00", "18:00"],
   2: ["08:00", "18:00"],
@@ -30,12 +61,31 @@ export const HOURS: Hours = {
   6: ["08:00", "17:00"],
 };
 
-export const POLICIES = {
+const DEFAULT_POLICIES: Policies = {
   cancellation: "Cancel free of charge until cutting starts. After cutting begins, your deposit covers the work already done.",
   deposit: "Production starts once 50% of the quote is paid. Pay the balance when you collect.",
   collection: "Please collect within 30 days of your ready date. Message us if you need more time.",
   important: "Bring your fabric (if you're supplying it) to your measuring visit. Arrive on time so your fitting isn't rushed.",
-} as const;
+};
+
+export const cloneSettings = (settings: StudioSettings): StudioSettings => ({ studio: { ...settings.studio }, hours: { ...settings.hours }, policies: { ...settings.policies } });
+
+export const defaultSettings = (): StudioSettings => cloneSettings({ studio: DEFAULT_STUDIO, hours: DEFAULT_HOURS, policies: DEFAULT_POLICIES });
+
+/**
+ * The studio details every screen reads. The saved settings in the store are the source of truth:
+ * `applySettings` copies them in here whenever they change, so both sides show the same details
+ * without every screen having to subscribe to the store.
+ */
+export const STUDIO: StudioDetails = { ...DEFAULT_STUDIO };
+export const HOURS: Hours = { ...DEFAULT_HOURS };
+export const POLICIES: Policies = { ...DEFAULT_POLICIES };
+
+export function applySettings(settings: StudioSettings) {
+  Object.assign(STUDIO, settings.studio);
+  Object.assign(POLICIES, settings.policies);
+  for (let day = 0; day < 7; day++) HOURS[day] = settings.hours[day] ?? null;
+}
 
 /** Real studio photos from @franz.qlodin on TikTok. */
 export const STUDIO_PHOTOS = [

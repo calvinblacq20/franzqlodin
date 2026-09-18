@@ -6,6 +6,10 @@ import { blurIn, motionMode, spring } from "../motion";
 import { LogoMark } from "./Brand";
 
 const SPLASH_KEY = "fq-splash-seen";
+/** Long enough to hold the finished logo, name and tagline on screen for about two seconds. */
+const SPLASH_MS = 3200;
+/** Without the write-in animation there is nothing to wait for, but the brand still gets a beat. */
+const SPLASH_CALM_MS = 1200;
 
 /** Launch screen: the monogram writes itself in, then the app fades up. */
 export function Splash() {
@@ -27,7 +31,7 @@ export function Splash() {
       } catch {
         /* private mode: the splash simply shows again next time */
       }
-    }, reduce ? 400 : 2000);
+    }, reduce ? SPLASH_CALM_MS : SPLASH_MS);
     return () => window.clearTimeout(timer);
   }, [show]);
 
@@ -59,7 +63,7 @@ export function Splash() {
             </div>
           </div>
           <div className="splash-bar" aria-hidden="true">
-            <motion.i initial={{ scaleX: 0 }} animate={{ scaleX: 1 }} transition={{ duration: 1.8, ease: [0.44, 0, 0.56, 1] }} />
+            <motion.i initial={{ scaleX: 0 }} animate={{ scaleX: 1 }} transition={{ duration: (SPLASH_MS - 200) / 1000, ease: [0.44, 0, 0.56, 1] }} />
           </div>
         </motion.div>
       )}

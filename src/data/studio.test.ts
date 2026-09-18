@@ -1,5 +1,7 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { balanceDue } from "../lib/orders";
+import { HOURS, POLICIES, STUDIO } from "./business";
+import { STYLES, styleById } from "./catalog";
 import { actions, getAppData, studio, type WalkInOrder } from "./store";
 
 const now = new Date(2026, 8, 15, 11, 0);
@@ -119,6 +121,59 @@ describe("owner actions", () => {
     if ("error" in again) throw new Error(again.error);
     expect(again.order.customerId).toBe(result.order.customerId);
     expect(again.order.status).toBe("quoted");
+  });
+
+  it("edits a style's price and hides it from clients without touching past orders", () => {
+    const before = getAppData().styles.find((s) => s.id === "agbada")!;
+    const quoted = getAppData().orders.find((o) => o.items.some((i) => i.styleId === "agbada"));
+    const quotedPrice = quoted?.items.find((i) => i.styleId === "agbada")?.unitPrice;
+
+    const saved = studio.saveStyle("agbada", { fromPrice: before.fromPrice + 300, readyDays: 16 });
+    if ("error" in saved) throw new Error(saved.error);
+    expect(getAppData().styles.find((s) => s.id === "agbada")).toMatchObject({ fromPrice: before.fromPrice + 300, readyDays: 16 });
+    expect(styleById("agbada")?.fromPrice).toBe(before.fromPrice + 300);
+    expect(STYLES.some((s) => s.id === "agbada")).toBe(true);
+
+    studio.saveStyle("agbada", { active: false });
+    expect(STYLES.some((s) => s.id === "agbada")).toBe(false);
+    // Hidden styles still resolve, so old orders keep their name and the catalogue can bring them back.
+    expect(styleById("agbada")?.name).toBe(before.name);
+    expect(quoted?.items.find((i) => i.styleId === "agbada")?.unitPrice).toBe(quotedPrice);
+
+    studio.resetStyles();
+    expect(getAppData().styles.find((s) => s.id === "agbada")).toMatchObject({ fromPrice: before.fromPrice, readyDays: before.readyDays });
+    expect(STYLES.some((s) => s.id === "agbada")).toBe(true);
+  });
+
+  it("checks a style before saving it", () => {
+    expect(studio.saveStyle("agbada", { name: " " })).toEqual({ error: "Give the style a name." });
+    expect(studio.saveStyle("agbada", { fromPrice: -20 })).toHaveProperty("error");
+    expect(studio.saveStyle("agbada", { readyDays: 0 })).toHaveProperty("error");
+    expect(studio.saveStyle("nope", { fromPrice: 10 })).toEqual({ error: "We couldn't find that style." });
+  });
+
+  it("saves studio details, hours and policies for both sides", () => {
+    const saved = studio.saveSettings({ studio: { phone: "020 999 8877", area: "Kakraba, Kasoa" }, policies: { deposit: "Half up front." } });
+    if ("error" in saved) throw new Error(saved.error);
+    expect(STUDIO.phone).toBe("020 999 8877");
+    expect(POLICIES.deposit).toBe("Half up front.");
+    expect(getAppData().settings.studio.area).toBe("Kakraba, Kasoa");
+
+    studio.saveSettings({ hours: { ...getAppData().settings.hours, 0: ["09:00", "13:00"], 1: null } });
+    expect(HOURS[0]).toEqual(["09:00", "13:00"]);
+    expect(HOURS[1]).toBeNull();
+
+    studio.resetSettings();
+    expect(STUDIO.phone).toBe("024 851 5773");
+    expect(HOURS[0]).toBeNull();
+  });
+
+  it("checks studio details before saving them", () => {
+    expect(studio.saveSettings({ studio: { ...getAppData().settings.studio, phone: "12" } })).toEqual({ error: "Enter a Ghana phone number, like 024 123 4567." });
+    expect(studio.saveSettings({ studio: { ...getAppData().settings.studio, name: " " } })).toEqual({ error: "The studio needs a name." });
+    expect(studio.saveSettings({ studio: { ...getAppData().settings.studio, tiktok: "not-a-link" } })).toEqual({ error: "Links must start with https://" });
+    expect(studio.saveSettings({ hours: { ...getAppData().settings.hours, 2: ["18:00", "08:00"] } })).toEqual({ error: "Each day has to close after it opens." });
+    expect(STUDIO.phone).toBe("024 851 5773");
   });
 
   it("checks a walk-in order before saving it", () => {

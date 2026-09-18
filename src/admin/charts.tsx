@@ -1,6 +1,6 @@
-import { motion, useReducedMotion } from "motion/react";
+import { motion } from "motion/react";
 import { useId, useLayoutEffect, useRef, useState, type KeyboardEvent, type PointerEvent, type ReactNode, type RefObject } from "react";
-import { spring } from "../motion";
+import { isCalm, motionMode, spring } from "../motion";
 
 /* Plain SVG charts (docs/admin-ui-guidelines.md §7). Lines in ink and slate; pastels only as labelled fills. */
 
@@ -54,7 +54,8 @@ interface LineChartProps {
 export function LineChart({ series, labels, format, axisFormat, ariaLabel, height = 240, emptyText, dataKey = "", animate = true, tipLabel }: LineChartProps) {
   const [ref, width] = useWidth<HTMLDivElement>();
   const [hover, setHover] = useState<number | null>(null);
-  const reduce = useReducedMotion();
+  // Calm mode skips the line drawing itself in; the fade (opacity) stays.
+  const reduce = isCalm();
   const gradientId = useId();
   const n = labels.length;
   const all = series.flatMap((s) => s.values.filter((v): v is number => v !== null));
@@ -159,7 +160,7 @@ export function LineChart({ series, labels, format, axisFormat, ariaLabel, heigh
             ) : null,
           )}
           {!empty && (
-            <motion.g key={dataKey} initial={reduce ? false : { opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
+            <motion.g key={dataKey} initial={motionMode() === "off" ? false : { opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
               {series.map((s) =>
                 s.area ? <path key={`${s.label}-area`} d={areaFor(s.values)} style={{ fill: `url(#${CSS.escape(gradientId)})` }} /> : null,
               )}
@@ -229,7 +230,7 @@ export interface Bar {
 
 export function BarChart({ bars, ariaLabel, height = 150, animate = true, format = String }: { bars: Bar[]; ariaLabel: string; height?: number; animate?: boolean; format?: (n: number) => string }) {
   const [ref, width] = useWidth<HTMLDivElement>();
-  const reduce = useReducedMotion();
+  const reduce = isCalm();
   const [hover, setHover] = useState<number | null>(null);
   const max = Math.max(1, ...bars.map((b) => b.value));
   const top = 18;
@@ -321,7 +322,7 @@ export interface Part {
 
 /** Makro's segmented bar with legend rows, instead of a pie chart. */
 export function SegmentedBar({ parts, format, ariaLabel, animate = true }: { parts: Part[]; format: (n: number) => string; ariaLabel: string; animate?: boolean }) {
-  const reduce = useReducedMotion();
+  const reduce = isCalm();
   if (!parts.length) return <p className="adm-meta">Nothing in this period.</p>;
   return (
     <div>

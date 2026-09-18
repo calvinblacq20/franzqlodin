@@ -16,6 +16,8 @@ export interface Style {
   studioFabricFrom: number;
   readyDays: number;
   featured?: boolean;
+  /** False hides the style from clients. Past orders keep showing it. */
+  active?: boolean;
   tone: Tone;
   /** Optional real photo in /public/photos. */
   photo?: string;

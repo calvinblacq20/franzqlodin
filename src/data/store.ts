@@ -4,17 +4,19 @@ import { localIso } from "../lib/format";
 import { orderNumber, receiptNumber } from "../lib/receipts";
 import { normalizeGhPhone } from "../lib/contact";
 import { balanceDue, canCancel, isActive, validatePayment } from "../lib/orders";
+import { applySettings, cloneSettings, defaultSettings, type StudioSettings } from "./business";
+import { applyStyles, defaultStyles } from "./catalog";
 import { createSeed, type AppData } from "./seed";
-import type { Appointment, ContactDetails, Customer, Delivery, LeadSource, MeasurePlan, MeasurementSet, MeasureKey, Occasion, Order, OrderItem, OrderStatus, PayChoice, Payment, PaymentMethod, ReviewStatus } from "./types";
+import type { Appointment, ContactDetails, Customer, Delivery, LeadSource, MeasurePlan, MeasurementSet, MeasureKey, Occasion, Order, OrderItem, OrderStatus, PayChoice, Payment, PaymentMethod, ReviewStatus, Style } from "./types";
 
-const KEY = "fq-demo-v4";
+const KEY = "fq-demo-v5";
 
 function load(): AppData {
   try {
     const raw = localStorage.getItem(KEY);
     if (raw) {
       const parsed = JSON.parse(raw) as AppData;
-      if (parsed.version === 4) return parsed;
+      if (parsed.version === 5) return parsed;
     }
   } catch (error) {
     console.warn("Could not read saved demo data, starting fresh.", error);
@@ -22,11 +24,19 @@ function load(): AppData {
   return createSeed(new Date());
 }
 
+/** Copies the saved prices and studio details into the objects every screen reads. */
+function publish(data: AppData) {
+  applyStyles(data.styles);
+  applySettings(data.settings);
+}
+
 let state: AppData = load();
+publish(state);
 const listeners = new Set<() => void>();
 
 function commit(next: AppData) {
   state = next;
+  publish(next);
   try {
     localStorage.setItem(KEY, JSON.stringify(next));
   } catch (error) {
@@ -432,6 +442,56 @@ export const studio = {
     if (!state.customers.some((c) => c.id === customerId)) return { error: "We couldn't find that client." };
     commit({ ...state, customers: state.customers.map((c) => (c.id === customerId ? { ...c, notes: notes.trim() } : c)) });
     return { ok: true };
+  },
+
+  /** Edits one style's name, prices, turnaround or visibility. */
+  saveStyle(styleId: string, patch: Partial<Pick<Style, "name" | "description" | "fromPrice" | "studioFabricFrom" | "readyDays" | "featured" | "active">>): Result<{ style: Style }> {
+    const current = state.styles.find((s) => s.id === styleId);
+    if (!current) return { error: "We couldn't find that style." };
+    const next: Style = { ...current, ...patch };
+    next.name = next.name.trim();
+    next.description = next.description.trim();
+    if (next.name.length < 2) return { error: "Give the style a name." };
+    const money = [next.fromPrice, next.studioFabricFrom];
+    if (money.some((value) => !Number.isFinite(value) || value < 0 || value > 100_000)) return { error: "Prices must be between GH₵ 0 and GH₵ 100,000." };
+    if (!Number.isInteger(next.readyDays) || next.readyDays < 1 || next.readyDays > 90) return { error: "Turnaround must be between 1 and 90 working days." };
+    commit({ ...state, styles: state.styles.map((s) => (s.id === styleId ? next : s)) });
+    return { style: next };
+  },
+
+  /** Puts the whole catalogue back to the starting prices. */
+  resetStyles() {
+    commit({ ...state, styles: defaultStyles() });
+  },
+
+  /** Saves the studio details, opening hours or policies. */
+  saveSettings(patch: { studio?: Partial<StudioSettings["studio"]>; hours?: StudioSettings["hours"]; policies?: Partial<StudioSettings["policies"]> }): Result<{ settings: StudioSettings }> {
+    const next = cloneSettings(state.settings);
+    if (patch.studio) Object.assign(next.studio, patch.studio);
+    if (patch.policies) Object.assign(next.policies, patch.policies);
+    if (patch.hours) next.hours = { ...patch.hours };
+
+    next.studio.name = next.studio.name.trim();
+    next.studio.phone = next.studio.phone.trim();
+    if (next.studio.name.length < 2) return { error: "The studio needs a name." };
+    if (!normalizeGhPhone(next.studio.phone)) return { error: "Enter a Ghana phone number, like 024 123 4567." };
+    for (const link of [next.studio.whatsappBusiness, next.studio.tiktok]) {
+      if (link.trim() && !/^https?:\/\/\S+$/.test(link.trim())) return { error: "Links must start with https://" };
+    }
+    if (next.studio.address.trim().length < 3) return { error: "Enter the studio address." };
+    for (let day = 0; day < 7; day++) {
+      const span = next.hours[day];
+      if (!span) continue;
+      const [open, close] = span;
+      if (!/^\d{2}:\d{2}$/.test(open) || !/^\d{2}:\d{2}$/.test(close)) return { error: "Opening hours use 24-hour times, like 08:00." };
+      if (close <= open) return { error: "Each day has to close after it opens." };
+    }
+    commit({ ...state, settings: next });
+    return { settings: next };
+  },
+
+  resetSettings() {
+    commit({ ...state, settings: defaultSettings() });
   },
 
   verifyMeasurements(setId: string) {

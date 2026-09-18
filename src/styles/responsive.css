@@ -20,7 +20,7 @@
 /* ========== Tablet and up ========== */
 @media (min-width: 810px) {
   :root {
-    --gutter: 32px;
+    --gutter: max(32px, env(safe-area-inset-left, 0px), env(safe-area-inset-right, 0px));
     --nav-h: 80px;
   }
 

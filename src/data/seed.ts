@@ -1,7 +1,9 @@
 import { addDays, dayKey, localIso, startOfDay } from "../lib/format";
 import { orderNumber, receiptNumber } from "../lib/receipts";
+import { defaultSettings, type StudioSettings } from "./business";
+import { defaultStyles } from "./catalog";
 import { createStudioBook } from "./studio-seed";
-import type { Appointment, ContactDetails, Customer, ID, MeasurementSet, Order, OrderStatus, Payment, Review } from "./types";
+import type { Appointment, ContactDetails, Customer, ID, MeasurementSet, Order, OrderStatus, Payment, Review, Style } from "./types";
 
 export interface Counters {
   order: number;
@@ -18,7 +20,7 @@ export interface DeviceState {
 }
 
 export interface AppData {
-  version: 4;
+  version: 5;
   seededAt: string;
   /** Every customer record the studio holds, guests included. */
   customers: Customer[];
@@ -29,6 +31,10 @@ export interface AppData {
   measurements: MeasurementSet[];
   appointments: Appointment[];
   reviews: Review[];
+  /** The catalogue the owner edits in Styles & prices. */
+  styles: Style[];
+  /** Studio details, hours and policies, edited in Settings. */
+  settings: StudioSettings;
   counters: Counters;
 }
 
@@ -221,8 +227,10 @@ export function createSeed(now: Date): AppData {
   }));
 
   return {
-    version: 4,
+    version: 5,
     seededAt: now.toISOString(),
+    styles: defaultStyles(),
+    settings: defaultSettings(),
     customers: [customer, ...book.customers],
     session: { customerId: null },
     device: { contact: null, orderIds: [], savedStyleIds: [] },

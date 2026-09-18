@@ -10,6 +10,7 @@ import { Explore } from "./client/Explore";
 import { Home } from "./client/Home";
 import { Orders } from "./client/Orders";
 import { Profile } from "./client/Profile";
+import { motionMode } from "./motion";
 
 // Deeper screens load on demand to keep the first download small on mobile data.
 const OrderFlow = lazy(() => import("./client/OrderFlow").then((m) => ({ default: m.OrderFlow })));
@@ -117,8 +118,12 @@ function ClientApp() {
 }
 
 export function App() {
+  // Motion follows the mode index.html resolved (data-motion), not the media query, so JS and CSS
+  // agree and ?motion= overrides reach the animations too. Calm drops slides, zooms and parallax
+  // but keeps fades; off renders every state immediately.
+  const mode = motionMode();
   return (
-    <MotionConfig reducedMotion="user">
+    <MotionConfig reducedMotion={mode === "full" ? "never" : "always"} transition={mode === "off" ? { duration: 0 } : undefined}>
       <HashRouter>
         <NotifyProvider>
           <Splash />

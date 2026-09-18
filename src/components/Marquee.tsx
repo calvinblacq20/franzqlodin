@@ -43,9 +43,9 @@ export function Marquee({ children, label, speed = 32, direction = "left", pause
 
     // Layout, measured on resize and on the watchdog tick only.
     let loopWidth = 0;
-    let viewWidth = 0;
     let dpr = 1;
-    let onScreen = true;
+    let pageTop = 0;
+    let pageBottom = 0;
     const measure = () => {
       const previous = loopWidth;
       loopWidth = set.offsetWidth;
@@ -54,7 +54,9 @@ export function Marquee({ children, label, speed = 32, direction = "left", pause
         written = Number.NaN;
         write();
       }
-      viewWidth = viewport.clientWidth;
+      const rect = viewport.getBoundingClientRect();
+      pageTop = rect.top + window.scrollY;
+      pageBottom = pageTop + rect.height;
       dpr = window.devicePixelRatio || 1;
     };
 
@@ -84,7 +86,11 @@ export function Marquee({ children, label, speed = 32, direction = "left", pause
       beat = performance.now();
       const step = frameStep(now, last);
       last = now;
-      if (pausedRef.current || hovered || focused || drag || now < resumeAt || !onScreen || loopWidth <= 0) return;
+      if (pausedRef.current || hovered || focused || drag || now < resumeAt || loopWidth <= 0) return;
+      // Resting while far off screen saves battery. Compared against positions cached by measure(),
+      // so there's no layout read here, and no observer callback that could fail to wake it.
+      const scrollY = window.scrollY;
+      if (scrollY + window.innerHeight < pageTop - 300 || scrollY > pageBottom + 300) return;
       offset = advance(offset, step, speed, loopWidth);
       write();
     };
@@ -94,20 +100,6 @@ export function Marquee({ children, label, speed = 32, direction = "left", pause
       last = null;
       frame = requestAnimationFrame(tick);
     };
-
-    // Observer pauses when far off-screen to save battery, but onScreen starts true so it never gates startup
-    const io =
-      typeof IntersectionObserver !== "undefined"
-        ? new IntersectionObserver(
-            (entries) => {
-              for (const entry of entries) {
-                onScreen = entry.isIntersecting;
-              }
-            },
-            { rootMargin: "300px 0px" },
-          )
-        : null;
-    io?.observe(viewport);
 
     const watchdog = window.setInterval(() => {
       measure();
@@ -201,7 +193,6 @@ export function Marquee({ children, label, speed = 32, direction = "left", pause
     return () => {
       cancelAnimationFrame(frame);
       window.clearInterval(watchdog);
-      io?.disconnect();
       resizeObserver.disconnect();
       viewport.removeEventListener("pointerdown", onPointerDown);
       viewport.removeEventListener("pointermove", onPointerMove);

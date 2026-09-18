@@ -124,9 +124,15 @@
   overflow: hidden;
   transition: transform 0.2s ease;
 }
-.look-card:hover {
-  transform: scale(1.02);
+/* Mouse only: on iPhone a tap leaves :hover stuck on, which would leave a card zoomed. */
+@media (hover: hover) {
+  .look-card:hover {
+    transform: scale(1.02);
+  }
 }
+/* Pause/play for the moving lookbook (moving content needs a way to stop it). */
+.lookbook-toggle { width: 36px; height: 36px; margin-block: -8px; color: var(--ink-75); }
+.lookbook-toggle:hover { color: var(--ink); }
 @media (min-width: 810px) {
   .looks {
     margin-inline: 0;
@@ -199,6 +205,10 @@
 .search-box input { flex: 1; min-width: 0; border: 0; outline: 0; background: transparent; font-size: 16px; }
 .search-box input::placeholder { color: var(--ink-50); }
 .style-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 12px; }
+/* Large phones and small tablets now get the full width: three columns keep tiles a sensible size. */
+@media (min-width: 600px) and (max-width: 809.98px) {
+  .style-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
 .style-tile { position: relative; display: flex; flex-direction: column; gap: 6px; text-align: left; }
 .style-tile .save { position: absolute; top: 8px; right: 8px; width: 34px; height: 34px; }
 

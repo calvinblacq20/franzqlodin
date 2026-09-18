@@ -358,6 +358,8 @@ button.row:active, a.row:active { background: var(--ink-06); }
   pointer-events: auto;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
+  max-width: 520px;
+  margin-inline: auto;
   gap: 4px;
   padding: 6px;
   border-radius: var(--r-pill);

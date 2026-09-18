@@ -384,8 +384,8 @@ The admin uses the same motion engine and springs as the client (`src/motion.ts`
 | Payments & receipts | `/admin/payments` | Composition bar (by method) + D as a table on desktop | Balances owed, total |
 | Reports | `/admin/reports` | A + C | – |
 | Reviews | `/admin/reviews` | D (status: waiting · published · hidden) with Approve / Hide / Reply | – |
-| Styles & prices | `/admin/styles` | Table with inline edit (price, turnaround, active switch) | – |
-| Settings | `/admin/settings` | Makro form cards (charcoal frame, white inner panel) | Reset demo data |
+| Styles & prices | `/admin/styles` | Table (rows on phones) with an edit sheet per style: name, description, starting price, studio-fabric add, turnaround, featured and shown-to-clients. Hidden styles stay on past orders. "Reset all prices" restores the starting catalogue | – |
+| Settings | `/admin/settings` | Editable cards, each saved on its own: studio details (name, phone/MoMo, area, address, directions, maps, links, about), opening hours per day, and the four policies. Each card shows "Unsaved" until saved and can undo | Reset settings · Reset demo data |
 
 ---
 
@@ -421,4 +421,5 @@ The admin uses the same motion engine and springs as the client (`src/motion.ts`
 | Shared UI | `charts.tsx` (line, bar, sparkline, split bar, ranked table), `controls.tsx` (KPI tabs, change pill, filters, action cards), `Dropdown.tsx`, `sheets.tsx` (payment, quote, WhatsApp update, stage, confirm), `orderActions.tsx` (order card, board card, one set of sheets per screen) |
 | Logic (tested) | `src/lib/metrics.ts` (periods, KPIs, workshop, rankings), `src/lib/filters.ts` (URL filters, search, sort, clients), `src/lib/studio.ts` (stage labels, next step, date line, WhatsApp messages) |
 | Data | Owner actions in `studio` (`src/data/store.ts`); the simulated studio book in `src/data/studio-seed.ts` |
+| Editable prices and settings | The store holds the catalogue (`data.styles`) and the studio settings (`data.settings`). `applyStyles` and `applySettings` copy them into the `STYLES`, `STUDIO`, `HOURS` and `POLICIES` objects every screen already reads, so an edit shows on both sides. `styleById` still resolves hidden styles, so past orders keep their names |
 | Styles | `src/styles/admin.css`, loaded only with the admin chunk |
