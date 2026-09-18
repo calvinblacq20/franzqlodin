@@ -30,3 +30,13 @@ All photos in `public/photos/` come from the studio's own TikTok account, [@fran
 | look-everyday.webp | Everyday lookbook | 7664496680657554708 |
 
 Post links follow the pattern `https://www.tiktok.com/@franz.qlodin/photo/<post id>` (or `/video/` for the showroom clips).
+
+## Stock photos
+
+The studio's TikTok has no school uniform photos yet, so one stock photo stands in. Swap it for the studio's own work when there is some.
+
+| File | Used for | Source | Licence |
+|---|---|---|---|
+| school-uniform.webp | School uniform style, School lookbook | "Children in plaid button-up shirt uniform" by Bright Kwabena Kyere, [unsplash.com/photos/xFPFucFuXp8](https://unsplash.com/photos/children-in-plaid-button-up-shirt-uniform-xFPFucFuXp8) | [Unsplash License](https://unsplash.com/license): free for commercial use, no credit required |
+
+The current file was built from a 600px preview, cropped to portrait around the boy and upscaled to 1484px with Real-ESRGAN. For full sharpness, replace `brand/photos-original/school-uniform.jpg` with the same crop from the 2895×2240 original, delete `brand/photos-upscaled/school-uniform.png`, and run `python scripts/build_photos.py`.

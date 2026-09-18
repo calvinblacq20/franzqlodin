@@ -102,6 +102,7 @@ export const OCCASION_PHOTOS: Record<string, string> = {
   funeral: "/photos/look-funeral.webp",
   political: "/photos/look-political.webp",
   work: "/photos/suit-blue.webp",
+  school: "/photos/school-uniform.webp",
   everyday: "/photos/look-everyday.webp",
 };
 

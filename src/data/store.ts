@@ -16,12 +16,18 @@ function load(): AppData {
     const raw = localStorage.getItem(KEY);
     if (raw) {
       const parsed = JSON.parse(raw) as AppData;
-      if (parsed.version === 5) return parsed;
+      if (parsed.version === 5) return withDefaultPhotos(parsed);
     }
   } catch (error) {
     console.warn("Could not read saved demo data, starting fresh.", error);
   }
   return createSeed(new Date());
+}
+
+/** Photos aren't editable, so a saved catalogue picks up photos added to the defaults later. */
+function withDefaultPhotos(data: AppData): AppData {
+  const photos = new Map(defaultStyles().map((s) => [s.id, s.photo]));
+  return { ...data, styles: data.styles.map((s) => (s.photo || !photos.get(s.id) ? s : { ...s, photo: photos.get(s.id) })) };
 }
 
 /** Copies the saved prices and studio details into the objects every screen reads. */
