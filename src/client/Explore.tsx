@@ -102,7 +102,7 @@ export function Explore() {
               return (
                 <motion.div key={style.id} layout="position" exit={{ opacity: 0, scale: 0.96 }} transition={spring.small} className="style-tile">
                   <Reveal y={32} delay={(i % 4) * 0.06}>
-                  <button onClick={() => navigate(`/order/new?style=${style.id}`)} className="stack gap-8" style={{ textAlign: "left" }} aria-label={`Order ${style.name}, from ${money(style.fromPrice)}`}>
+                  <button onClick={() => navigate(`/order/new?style=${style.id}`)} className="stack gap-8" style={{ textAlign: "left", width: "100%" }} aria-label={`Order ${style.name}, from ${money(style.fromPrice)}`}>
                     <Photo tone={style.tone} src={style.photo} alt={style.name} sizes="(min-width: 1200px) 290px, (min-width: 810px) 33vw, 50vw" ratio="4 / 5" radius="var(--r-img)" markSize={44} />
                     <span className="stack">
                       <span className="t-title" style={{ fontSize: 15 }}>{style.name}</span>

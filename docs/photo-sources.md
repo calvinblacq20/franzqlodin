@@ -39,4 +39,4 @@ The studio's TikTok has no school uniform photos yet, so one stock photo stands 
 |---|---|---|---|
 | school-uniform.webp | School uniform style, School lookbook | "Children in plaid button-up shirt uniform" by Bright Kwabena Kyere, [unsplash.com/photos/xFPFucFuXp8](https://unsplash.com/photos/children-in-plaid-button-up-shirt-uniform-xFPFucFuXp8) | [Unsplash License](https://unsplash.com/license): free for commercial use, no credit required |
 
-The current file was built from a 600px preview, cropped to portrait around the boy and upscaled to 1484px with Real-ESRGAN. For full sharpness, replace `brand/photos-original/school-uniform.jpg` with the same crop from the 2895×2240 original, delete `brand/photos-upscaled/school-uniform.png`, and run `python scripts/build_photos.py`.
+`brand/photos-original/school-uniform.jpg` is a portrait crop (1792×2240) of the 2895×2240 original, framed on the boy. It's used at native resolution, not upscaled.

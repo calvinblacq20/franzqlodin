@@ -30,6 +30,7 @@ TILE = 128
 OVERLAP = 16
 SCALE = 4
 UPSCALE_BELOW = 1440
+NATIVE_ENOUGH = 1600
 
 
 def feather(size: int, overlap: int) -> np.ndarray:
@@ -97,7 +98,8 @@ def main() -> None:
             continue
         img = trim_letterbox(cv2.imread(str(path)))
         h, w = img.shape[:2]
-        if w >= args.below:
+        # The model is fed at MAX_WIDTH / 4 (540px), so wide sources would lose more detail than it adds.
+        if w >= args.below or w >= NATIVE_ENOUGH:
             print(f"skip {name}: already {w}px wide")
             continue
         if (OUT / f"{name}.png").exists():
