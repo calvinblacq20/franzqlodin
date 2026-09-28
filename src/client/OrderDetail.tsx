@@ -1,8 +1,8 @@
 import { ArrowLeft, Ban, CalendarPlus, Check, ChevronRight, CircleAlert, Lock, MessageCircle, Navigation, Phone, ReceiptText, RefreshCw, Ruler, ShoppingBag, Store } from "lucide-react";
 import { motion } from "motion/react";
 import { useCallback, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
-import { AccountSheet, FindOrderSheet } from "../components/AccountSheets";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
+import { FindOrderSheet } from "../components/AccountSheets";
 import { CalendarSheet } from "../components/ActionSheets";
 import { Badge, Photo, Skeleton, useSkeleton } from "../components/Bits";
 import { Button } from "../components/Button";
@@ -12,10 +12,12 @@ import { useNotify } from "../components/Notify";
 import { SuccessScreen } from "../components/Overlays";
 import { PaystackSheet } from "../components/Paystack";
 import { Sheet } from "../components/Sheet";
+import { prefillAuthDraft } from "../data/authDraft";
 import { POLICIES, STUDIO } from "../data/business";
 import { EMBROIDERY_OPTIONS, FIT_OPTIONS, MEASURE_SOURCE_LABEL, occasionLabel, styleById } from "../data/catalog";
 import { accessOf, accountOf, actions, customerById, useAppData, type OnlinePayment } from "../data/store";
 import type { Order } from "../data/types";
+import { splitName } from "../lib/auth";
 import { amountDue, canViewOrder } from "../lib/checkout";
 import { formatGhPhone, mapsLinks, telLink, whatsappLink } from "../lib/contact";
 import { fmtDate, fmtDay, fmtDayShort, fmtTime, money, parseLocal, plural } from "../lib/format";
@@ -53,7 +55,8 @@ export function OrderDetail() {
 
 function NotOnThisPhone() {
   const [findOpen, setFindOpen] = useState(false);
-  const [loginOpen, setLoginOpen] = useState(false);
+  const navigate = useNavigate();
+  const { pathname } = useLocation();
   return (
     <main className="screen">
       <TopBar back alwaysSolid />
@@ -69,11 +72,10 @@ function NotOnThisPhone() {
           <Button variant="dark" onClick={() => setFindOpen(true)}>
             Find my order
           </Button>
-          <Button onClick={() => setLoginOpen(true)}>Log in</Button>
+          <Button onClick={() => navigate(`/login?next=${encodeURIComponent(pathname)}`)}>Log in</Button>
         </div>
       </div>
       <FindOrderSheet open={findOpen} onClose={() => setFindOpen(false)} />
-      <AccountSheet open={loginOpen} onClose={() => setLoginOpen(false)} mode="login" />
     </main>
   );
 }
@@ -104,7 +106,6 @@ function OrderView({ order }: { order: Order }) {
   const [cancelOpen, setCancelOpen] = useState(false);
   const [cancelling, setCancelling] = useState(false);
   const [cancelledShow, setCancelledShow] = useState(false);
-  const [accountOpen, setAccountOpen] = useState(false);
   const customer = customerById(data, order.customerId);
   const account = accountOf(data);
 
@@ -273,7 +274,15 @@ function OrderView({ order }: { order: Order }) {
             <p className="t-title">Keep this order on any phone</p>
             <p className="muted">Optional. Save an account with {formatGhPhone(customer.phone)} and your orders, measurements and receipts go wherever you log in.</p>
             <div className="account-card-actions">
-              <Button variant="lime" size="sm" onClick={() => setAccountOpen(true)}>
+              <Button
+                variant="lime"
+                size="sm"
+                onClick={() => {
+                  // Start the form off with what the studio already has for this order.
+                  prefillAuthDraft({ ...splitName(customer.name), email: customer.email, phone: formatGhPhone(customer.phone) });
+                  navigate(`/signup?next=${encodeURIComponent(`/orders/${order.id}`)}`);
+                }}
+              >
                 Create account
               </Button>
             </div>
@@ -494,7 +503,6 @@ function OrderView({ order }: { order: Order }) {
         phone={customer?.phone ?? ""}
         onPaid={pay}
       />
-      <AccountSheet open={accountOpen} onClose={() => setAccountOpen(false)} mode="create" defaultName={customer?.name} defaultPhone={customer ? formatGhPhone(customer.phone) : ""} />
 
       <Sheet open={directionsOpen} onClose={() => setDirectionsOpen(false)} title="Get directions">
         <div className="stack gap-12">

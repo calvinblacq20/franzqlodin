@@ -1,7 +1,5 @@
 import { Check, CircleAlert, Lock, Ruler } from "lucide-react";
-import { useState } from "react";
-import { Link } from "react-router-dom";
-import { AccountSheet } from "../components/AccountSheets";
+import { Link, useNavigate } from "react-router-dom";
 import { Badge, Skeleton, useSkeleton } from "../components/Bits";
 import { Button } from "../components/Button";
 import { TopBar } from "../components/Chrome";
@@ -14,7 +12,7 @@ export function Measurements() {
   const loading = useSkeleton(500);
   const data = useAppData();
   const account = accountOf(data);
-  const [loginOpen, setLoginOpen] = useState(false);
+  const navigate = useNavigate();
   // Measurements are personal, so they only show for the logged-in account.
   const sets = account ? data.measurements.filter((m) => m.customerId === account.id).sort((a, b) => b.takenAt.localeCompare(a.takenAt)) : [];
 
@@ -38,9 +36,9 @@ export function Measurements() {
           </span>
           <p className="t-title">Log in to see your measurements</p>
           <p className="muted" style={{ maxWidth: "38ch" }}>
-            The studio keeps every set it takes. Log in with your WhatsApp number to see them here.
+            The studio keeps every set it takes. Log in to see them here, on any phone.
           </p>
-          <Button variant="dark" onClick={() => setLoginOpen(true)} style={{ marginTop: 8 }}>
+          <Button variant="dark" onClick={() => navigate("/login?next=/profile/measurements")} style={{ marginTop: 8 }}>
             Log in
           </Button>
         </div>
@@ -96,7 +94,6 @@ export function Measurements() {
           Measurements are in inches. The studio checks them at every fitting.
         </p>
       )}
-      <AccountSheet open={loginOpen} onClose={() => setLoginOpen(false)} mode="login" />
     </main>
   );
 }
