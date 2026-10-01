@@ -218,55 +218,49 @@ button.row:active, a.row:active { background: var(--ink-06); }
 }
 .chip.is-active { background: var(--ink); color: #fff; box-shadow: none; }
 .chip-count {
-  display: grid;
-  place-items: center;
-  min-width: 20px;
-  height: 20px;
-  padding-inline: 5px;
-  border-radius: var(--r-pill);
-  background: var(--ground);
-  color: var(--ink);
-  font-size: 11px;
-  font-weight: 500;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink-75);
+  font-variant-numeric: tabular-nums;
 }
-.chip.is-active .chip-count { background: var(--lime); }
+.chip.is-active .chip-count { color: var(--lime); }
 
 .badge {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  height: 28px;
-  padding: 2px 12px 2px 2px;
-  border-radius: var(--r-pill);
+  gap: 6px;
   font-size: 13px;
+  font-weight: 500;
+  line-height: 1.3;
   white-space: nowrap;
-  background: var(--surface);
+  color: var(--ink);
 }
-.badge-well {
-  display: grid;
-  place-items: center;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.7);
-}
-.badge.is-lime { background: var(--lime); }
-.badge.is-sand { background: var(--sand); }
-.badge.is-sky { background: var(--sky); }
-.badge.is-lilac { background: var(--lilac); }
-.badge.is-mist { background: var(--mist); }
-.badge.is-danger { background: var(--danger-wash); color: var(--danger); }
-.badge.is-wash { background: var(--ground); }
+.badge-well { display: inline-flex; flex: none; }
+.badge.is-lime { color: var(--label-lime); }
+.badge.is-sand { color: var(--label-sand); }
+.badge.is-sky { color: var(--label-sky); }
+.badge.is-lilac { color: var(--label-lilac); }
+.badge.is-mist { color: var(--label-mist); }
+.badge.is-danger { color: var(--label-danger); }
+.badge.is-wash { color: var(--ink-75); }
 
 .pill-tag {
   display: inline-flex;
   align-items: center;
-  height: 22px;
-  padding-inline: 8px;
-  border-radius: var(--r-pill);
-  background: var(--ground);
-  font-size: 11px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ink-75);
   letter-spacing: 0;
+}
+
+/* On dark surfaces labels take the bright pill colours, which read well there. */
+:is(.adm-dark, .act-card, .act-banner, .closing, .momo-card, .alert-foot, .desk-copy, .balance-card, .account-card, .option.is-selected, .btn-dark, .btn-cta, .chip.is-active, .date-cell.is-selected, .slot.is-selected, .success, .auth-top) {
+  --label-lime: var(--lime);
+  --label-sand: var(--sand);
+  --label-sky: var(--sky);
+  --label-lilac: var(--lilac);
+  --label-mist: var(--mist);
+  --label-danger: #ff9a87;
 }
 
 /* ---------- Skeleton ---------- */

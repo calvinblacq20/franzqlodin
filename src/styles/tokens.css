@@ -68,3 +68,17 @@
   --nav-h: 0px;
   --safe-bottom: env(safe-area-inset-bottom, 0px);
 }
+
+/*
+ * Status, money and trend labels are coloured words, not pills. Each pill colour is deepened just
+ * enough to read on white and on the ground (4.5:1 or more). Dark surfaces switch back to the bright
+ * colours (ui.css), like the selected date's month.
+ */
+:root {
+  --label-lime: #4f7300;
+  --label-sand: var(--warning-ink);
+  --label-sky: #1a63a8;
+  --label-lilac: #5a3ec8;
+  --label-mist: #6b6470;
+  --label-danger: #b83a26;
+}
