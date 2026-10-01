@@ -10,6 +10,7 @@ import { Marquee } from "../components/Marquee";
 import { Reveal } from "../components/Reveal";
 import { CountUp, ScrollRevealText, useScrollTo } from "../components/Scroll";
 import { ClosingCta } from "./home/ClosingCta";
+import { nextSlide, preloadPhoto, useAutoplay } from "./home/autoplay";
 import { useHeroCurve } from "./home/heroCurve";
 import { HowItWorks } from "./home/HowItWorks";
 import { WhyBento } from "./home/WhyBento";
@@ -22,7 +23,7 @@ import type { CategoryId } from "../data/types";
 import { telLink, whatsappLink } from "../lib/contact";
 import { fmtDate, money, weekdayLong } from "../lib/format";
 import { openStatus } from "../lib/schedule";
-import { enter, isCalm, spring } from "../motion";
+import { enter, isCalm, motionMode, spring } from "../motion";
 
 const SECTIONS = [
   { id: "lookbook", label: "Lookbook" },
@@ -34,6 +35,10 @@ const SECTIONS = [
 
 const FEATURE_ICONS = { truck: Truck, users: Users, school: GraduationCap, scissors: Scissors, wallet: Wallet, ruler: Ruler } as const;
 const HERO = STUDIO_PHOTOS;
+const heroShot = (n: number) => HERO[n % HERO.length] ?? HERO[0];
+/** Rendered widths of the gallery's big photo and its two side photos. */
+const GALLERY_SIZES = ["(min-width: 1024px) 800px, 66vw", "(min-width: 1024px) 400px, 33vw", "(min-width: 1024px) 400px, 33vw"] as const;
+const GALLERY_FADE_S = 0.9;
 const STATEMENT =
   "Franz Qlodin is a Kasoa tailoring studio for everything menswear. Suits, kaftans, agbada and uniforms, measured, cut and finished in-house for the moments you dress up for.";
 const HIGHLIGHTS = [
@@ -143,6 +148,22 @@ function StudioPage() {
   const galleryRef = useRef<HTMLDivElement>(null);
   const galleryCurve = useHeroCurve(galleryRef);
   const heroCurve = useHeroCurve(heroRef, { overlap: 24 });
+  // The photos also move on by themselves: the gallery crossfades to the next set, the phone carousel slides.
+  const trackRef = useRef<HTMLDivElement>(null);
+  // `prev` is the set being covered while the next one fades in over it.
+  const [gallery, setGallery] = useState<{ step: number; prev: number | null }>({ step: 0, prev: null });
+  useAutoplay(galleryRef, async () => {
+    const next = gallery.step + 1;
+    await Promise.all(GALLERY_SIZES.map((sizes, i) => preloadPhoto(heroShot(next + i).src, sizes)));
+    setGallery({ step: next, prev: gallery.step });
+  });
+  useAutoplay(heroRef, async () => {
+    const track = trackRef.current;
+    if (!track) return;
+    const next = nextSlide(track.scrollLeft, track.clientWidth, HERO.length);
+    await preloadPhoto(heroShot(next).src, "100vw");
+    track.scrollTo({ left: next * track.clientWidth, behavior: motionMode() === "full" ? "smooth" : "auto" });
+  });
 
   const actionButtons = (
     <>
@@ -186,10 +207,27 @@ function StudioPage() {
 
       {/* Wider screens: photo gallery grid */}
       <motion.div ref={galleryRef} className="desk-gallery desktop-only" style={{ clipPath: galleryCurve.clipPath, WebkitClipPath: galleryCurve.WebkitClipPath }}>
-        {HERO.slice(0, 3).map((shot, i) => (
-          <div key={shot.src} className="gallery-cell">
+        {GALLERY_SIZES.map((sizes, i) => (
+          <div key={i} className="gallery-cell">
             <motion.div className="gallery-inner" initial={calm ? { opacity: 0 } : { scale: 1.18, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ ...spring.settle, delay: 0.08 * i }} style={calm ? undefined : { y: heroY }}>
-              <Photo tone="mist" src={shot.src} alt={shot.alt} position={shot.position} eager={i === 0} sizes={i === 0 ? "(min-width: 1024px) 800px, 66vw" : "(min-width: 1024px) 400px, 33vw"} height="100%" radius={0} markSize={i === 0 ? 150 : 70} />
+              {/* The incoming photo fades in on top; the old one stays underneath until the last cell has finished. */}
+              {(gallery.prev === null ? [gallery.step] : [gallery.prev, gallery.step]).map((step) => {
+                const shot = heroShot(step + i);
+                const incoming = gallery.prev !== null && step === gallery.step;
+                return (
+                  <motion.div
+                    key={shot.src}
+                    className="gallery-layer"
+                    aria-hidden={step !== gallery.step || undefined}
+                    initial={gallery.prev === null ? false : { opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: GALLERY_FADE_S, delay: 0.12 * i, ease: [0.44, 0, 0.56, 1] }}
+                    onAnimationComplete={incoming && i === GALLERY_SIZES.length - 1 ? () => setGallery((g) => ({ ...g, prev: null })) : undefined}
+                  >
+                    <Photo tone="mist" src={shot.src} alt={shot.alt} position={shot.position} eager={i === 0} sizes={sizes} height="100%" radius={0} markSize={i === 0 ? 150 : 70} />
+                  </motion.div>
+                );
+              })}
             </motion.div>
           </div>
         ))}
@@ -201,6 +239,7 @@ function StudioPage() {
       {/* Phone: hero carousel */}
       <motion.div ref={heroRef} className="hero mobile-only" style={{ clipPath: heroCurve.clipPath, WebkitClipPath: heroCurve.WebkitClipPath }}>
         <motion.div
+          ref={trackRef}
           className="hero-track"
           style={calm ? undefined : { y: heroY, scale: heroScale }}
           onScroll={(e) => {
